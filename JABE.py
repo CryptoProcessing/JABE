@@ -1,7 +1,7 @@
 from flask import Flask, Blueprint
-# from models import db
+from models import db
 from extensions import rest_api
-from controllers.api_controller import Api
+from controllers.api_controller import BitcoinNodeApi
 
 
 def create_app(object_name):
@@ -9,22 +9,23 @@ def create_app(object_name):
     app = Flask(__name__)
     app.config.from_object(object_name)
 
-    # db.app = app
-    # db.init_app(app)
+    db.app = app
+    db.init_app(app)
 
     auth_blueprint = Blueprint('auth', __name__)
 
     # define the API resources
-    pricelast_view = Api.as_view('last_price')
+    block_notify_view = BitcoinNodeApi.as_view('block_notify_view')
 
+    bitcoin_blueprint = Blueprint('address', __name__)
     # add Rules for API Endpoints
-    auth_blueprint.add_url_rule(
-        '/hello',
-        view_func=pricelast_view,
-        methods=['GET']
+    bitcoin_blueprint.add_url_rule(
+        '/btc/block',
+        view_func=block_notify_view,
+        methods=['POST']
     )
 
-    app.register_blueprint(auth_blueprint, url_prefix='/api/v1')
+    app.register_blueprint(bitcoin_blueprint, url_prefix='/api/v1')
 
     rest_api.init_app(app)
 
