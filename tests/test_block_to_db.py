@@ -6,7 +6,7 @@ from pycoin.serialize import h2b
 
 from models import db, Block, Transactions, TxIns, TxOuts
 from tests.base import BaseTestCase
-from controllers.to_db import block_to_db
+from controllers.save_to_db import block_to_db
 
 
 class TestBlockToDb(BaseTestCase):
@@ -22,7 +22,7 @@ class TestBlockToDb(BaseTestCase):
 
         block_data = h2b(self.block_hash)
         self.block_object = BlockObject.parse(io.BytesIO(block_data))
-        block_to_db(self.block_object)
+        block_to_db(self.block_object, 500000)
 
     def test_block(self):
         blocks = Block.query.all()

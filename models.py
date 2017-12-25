@@ -26,11 +26,18 @@ class Block(db.Model):
     mercle_root = db.Column(db.String(64), nullable=False)
     difficulty = db.Column(db.Integer, nullable=False)
     nonce = db.Column(db.Integer, nullable=False)
-    previous_block_hash = db.Column(db.String(64), nullable=False)
+    # previous_block_hash = db.Column(db.String(64), nullable=False)
+
+    parent_id = db.Column(db.Integer, db.ForeignKey(id))
+    next_block = db.relationship(
+        'Block', backref=db.backref('prev_block', remote_side=[id]),
+        lazy='dynamic')
+
     timestamp = db.Column(db.Integer, nullable=False)
     version = db.Column(db.Integer, nullable=False)
     tx_count = db.Column(db.Integer, nullable=False)
     transactions = db.relationship('Transactions', backref='block', lazy=True)
+    height = db.Column(db.Integer, nullable=False)
 
 
 class Transactions(db.Model):

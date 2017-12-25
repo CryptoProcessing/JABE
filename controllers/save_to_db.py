@@ -47,16 +47,17 @@ def tx_to_db(txs, block):
         tx_out_to_db(tx.txs_out, tx_db)
 
 
-def block_to_db(block_object):
+def block_to_db(block_object, height):
     block = Block(
         block_hash=str(block_object.hash()),
         mercle_root=str(block_object.merkle_root),
         difficulty=block_object.difficulty,
         nonce=block_object.nonce,
-        previous_block_hash=str(block_object.previous_block_hash),
+        prev_block=Block.query.filter_by(block_hash=block_object.previous_block_hash).first(),
         timestamp=block_object.timestamp,
         version=block_object.version,
-        tx_count=len(block_object.txs)
+        tx_count=len(block_object.txs),
+        height=height
     )
 
     block.save()

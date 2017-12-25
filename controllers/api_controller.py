@@ -2,7 +2,7 @@ import datetime
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 from . import bitcoin
-from .to_db import block_to_db
+from .save_to_db import block_to_db
 from extensions import celery
 
 
@@ -11,7 +11,7 @@ def block_checker(block):
 
     block_object, block_height = bitcoin.get_block(block)
     # count = bitcoin.check_address_in_transaction(block_hash)
-    block_to_db(block_object)
+    block_to_db(block_object, block_height)
     print(block_object)
 
     return block_height

@@ -8,16 +8,17 @@ class TestBlockModel(BaseTestCase):
 
     def setUp(self):
         super(TestBlockModel, self).setUp()
-
+        prev_block = Block.query.filter_by(block_hash='000000000000000000008d511a269a69381e3c7ad1749cf2573d538f745d3f30').first()
         self.block = Block(
             block_hash='000000000000000000872785e17f233dda3ce3cf0e1c9a80180ab2398fc0206d',
             mercle_root='49b2c5a39b328adca6b8b1d22239fc7d3161dff2ad3fbfc70c6782f7dd777067',
             difficulty=402691653,
             nonce=1778502501,
-            previous_block_hash='000000000000000000008d511a269a69381e3c7ad1749cf2573d538f745d3f30',
+            prev_block=prev_block,
             timestamp=1514107322,
             version=536870912,
-            tx_count=2137
+            tx_count=2137,
+            height=500000
         )
         self.block.save()
 
@@ -54,11 +55,30 @@ class TestBlockModel(BaseTestCase):
         self.assertEqual(self.block.mercle_root, '49b2c5a39b328adca6b8b1d22239fc7d3161dff2ad3fbfc70c6782f7dd777067')
         self.assertEqual(self.block.difficulty, 402691653)
         self.assertEqual(self.block.nonce, 1778502501)
-        self.assertEqual(self.block.previous_block_hash,
-                         '000000000000000000008d511a269a69381e3c7ad1749cf2573d538f745d3f30')
+        self.assertEqual(self.block.prev_block, None)
         self.assertEqual(self.block.timestamp, 1514107322)
         self.assertEqual(self.block.version, 536870912)
         self.assertEqual(self.block.tx_count, 2137)
+        self.assertEqual(self.block.height, 500000)
+
+    def test_block_with_prev(self):
+        prev_block = Block.query.filter_by(
+            block_hash='000000000000000000872785e17f233dda3ce3cf0e1c9a80180ab2398fc0206d').first()
+        block = Block(
+            block_hash='000000000000000000000000e17f233dda3ce3cf0e1c9a80180ab2398f000000',
+            mercle_root='49b2c5a39b328adca6b8b1d22239fc7d3161dff2ad3fbfc70c6782f7dd777067',
+            difficulty=402691653,
+            nonce=1778502501,
+            prev_block=prev_block,
+            timestamp=1514107322,
+            version=536870912,
+            tx_count=2000,
+            height=500001
+        )
+        self.block.save()
+        self.assertEqual(block.block_hash, '000000000000000000000000e17f233dda3ce3cf0e1c9a80180ab2398f000000')
+        self.assertEqual(block.prev_block, prev_block)
+        self.assertEqual(block.tx_count, 2000)
 
     def test_tx(self):
 
