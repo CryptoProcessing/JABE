@@ -46,7 +46,6 @@ class MyProxy(bitcoin.rpc.Proxy):
             return r
         except bitcoin.rpc.InvalidAddressOrKeyError as ex:
             raise IndexError('%s.getblock(): %s (%d)' %
-
                              (self.__class__.__name__, ex.error['message'], ex.error['code']))
 
 

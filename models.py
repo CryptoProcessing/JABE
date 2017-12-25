@@ -3,7 +3,18 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 
+
+def init_db(db):
+    """Add a save() function to db.Model"""
+    def save(model):
+        db.session.add(model)
+        db.session.commit()
+
+    db.Model.save = save
+
+
 db = SQLAlchemy()
+init_db(db)
 
 
 class Block(db.Model):
@@ -27,7 +38,7 @@ class Transactions(db.Model):
     __tablename__ = "transactions"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    hash = db.Column(db.String(64), nullable=False)
+    hash = db.Column(db.String(64), nullable=False, index=True)
     version = db.Column(db.Integer, nullable=False)
     lock_time = db.Column(db.Integer, nullable=False)
     size = db.Column(db.Integer, nullable=False)  # len(tx.as_bin())

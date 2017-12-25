@@ -118,3 +118,14 @@ pyvenv.cfg
 .venv
 pip-selfcheck.json
 
+.idea
+
+Будет удалено .idea/JABE.iml
+Будет удалено .idea/dataSources.local.xml
+Будет удалено .idea/dataSources/
+Будет удалено .idea/inspectionProfiles/
+Будет удалено .idea/misc.xml
+Будет удалено .idea/modules.xml
+Будет удалено .idea/workspace.xml
+Будет удалено static/
+Будет удалено templates/

@@ -19,8 +19,7 @@ class TestBlockModel(BaseTestCase):
             version=536870912,
             tx_count=2137
         )
-        db.session.add(self.block)
-        db.session.commit()
+        self.block.save()
 
         self.tx = Transactions(
             block=self.block,
@@ -30,8 +29,7 @@ class TestBlockModel(BaseTestCase):
             size=289,
             position=150
         )
-        db.session.add(self.tx)
-        db.session.commit()
+        self.tx.save()
 
         self.tx_in = TxIns(
             transaction=self.tx,
@@ -40,8 +38,7 @@ class TestBlockModel(BaseTestCase):
             script='04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73',
             previous_id=None # child
         )
-        db.session.add(self.tx_in)
-        db.session.commit()
+        self.tx_in.save()
 
         self.tx_out = TxOuts(
             transaction=self.tx,
@@ -49,8 +46,7 @@ class TestBlockModel(BaseTestCase):
             coin_value=5000000000,
             script='4104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac'
         )
-        db.session.add(self.tx_in)
-        db.session.commit()
+        self.tx_out.save()
 
     def test_block(self):
 
@@ -96,8 +92,7 @@ class TestBlockModel(BaseTestCase):
             previous=self.tx_out # child
         )
 
-        db.session.add(tx_in_with_link_on_out)
-        db.session.commit()
+        tx_in_with_link_on_out.save()
 
         self.assertEqual(tx_in_with_link_on_out.transaction, self.tx)
         self.assertEqual(tx_in_with_link_on_out.position, 11)
