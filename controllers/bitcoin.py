@@ -1,12 +1,9 @@
 import io
 import bitcoin.rpc
-from flask import current_app
 from bitcoin import SelectParams
-from bitcoin.core import CMutableTransaction
-from pycoin.tx.Tx import Tx
 from pycoin.block import Block
-from pycoin.serialize import h2b
-
+from pycoin.serialize import h2b, b2h_rev
+from tenacity import retry, stop_after_attempt
 
 SelectParams("mainnet")
 
@@ -49,6 +46,7 @@ class MyProxy(bitcoin.rpc.Proxy):
                              (self.__class__.__name__, ex.error['message'], ex.error['code']))
 
 
+@retry
 def get_block(block):
     """
     Get block by hash
@@ -59,16 +57,49 @@ def get_block(block):
 
     try:
         blockinfo = mrpc.get_raw_block(bitcoin.rpc.lx(block))
-        mrpc = MyProxy()
         block_header = mrpc.getblockheader(bitcoin.rpc.lx(block), True)
         if block_header:
             block_height = block_header['height']
         else:
             block_height = None
     except TimeoutError as e:
-        return e
+        raise e
 
     block_data = h2b(blockinfo)
     block_object = Block.parse(io.BytesIO(block_data))
 
     return block_object, block_height
+
+
+@retry
+def get_block_hash(block_number):
+    """
+    Get block hash by number
+    :param block_number:
+    :return:
+    """
+    mrpc = MyProxy()
+
+    try:
+        block_hash = mrpc.getblockhash(block_number)
+        return b2h_rev(block_hash)
+
+    except TimeoutError as e:
+        raise e
+
+
+@retry
+def get_blockcount():
+    """
+    :return:
+    """
+    mrpc = MyProxy()
+
+    try:
+        blockcount = mrpc.getblockcount()
+        return blockcount
+
+    except TimeoutError as e:
+        raise e
+
+
