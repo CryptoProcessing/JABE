@@ -4,9 +4,9 @@ from pycoin.block import Block as BlockObject
 from pycoin.serialize import h2b
 
 
-from models import db, Block, Transactions, TxIns, TxOuts
+from models import db, Block, Transaction, TxIn, TxOut
 from tests.base import BaseTestCase
-from controllers.save_to_db import block_to_db
+from controllers.save_to_db import block_to_db, get_max_height
 
 
 class TestBlockToDb(BaseTestCase):
@@ -31,19 +31,24 @@ class TestBlockToDb(BaseTestCase):
         self.assertEqual(blocks[0].block_hash, '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f')
 
     def test_transaction(self):
-        txs = Transactions.query.all()
+        txs = Transaction.query.all()
 
         self.assertEqual(len(txs), 1)
         self.assertEqual(txs[0].hash, '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b')
 
     def test_ins(self):
-        txs = TxIns.query.all()
+        txs = TxIn.query.all()
 
         self.assertEqual(len(txs), 1)
         self.assertEqual(txs[0].script, '04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73')
 
     def test_outs(self):
-        txs = TxOuts.query.all()
+        txs = TxOut.query.all()
 
         self.assertEqual(len(txs), 1)
         self.assertEqual(txs[0].coin_value, 5000000000)
+
+    def test_max_height(self):
+        max = get_max_height()
+
+        self.assertEqual(max, 500000)

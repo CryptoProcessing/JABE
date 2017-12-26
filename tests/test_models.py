@@ -1,6 +1,5 @@
 import unittest
-
-from models import db, Block, Transactions, TxIns, TxOuts
+from models import db, Block, Transaction, TxIn, TxOut, Address, get_one_or_create
 from tests.base import BaseTestCase
 
 
@@ -20,19 +19,22 @@ class TestBlockModel(BaseTestCase):
             tx_count=2137,
             height=500000
         )
-        self.block.save()
 
-        self.tx = Transactions(
-            block=self.block,
+
+        self.tx = Transaction(
+            # block=self.block,
             hash='a705dac9b33a88d64fbe10f353a20051bdf8a717c84b981cb88591023c3e09ad',
             version=1,
             lock_time=0,
             size=289,
             position=150
         )
-        self.tx.save()
 
-        self.tx_in = TxIns(
+        self.tx.save()
+        self.block.transactions.append(self.tx)
+        self.block.save()
+
+        self.tx_in = TxIn(
             transaction=self.tx,
             position=10,
             sequence='4294967295',
@@ -41,11 +43,12 @@ class TestBlockModel(BaseTestCase):
         )
         self.tx_in.save()
 
-        self.tx_out = TxOuts(
+        self.tx_out = TxOut(
             transaction=self.tx,
             position=15,
             coin_value=5000000000,
-            script='4104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac'
+            script='4104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac',
+            address=get_one_or_create(db.session, Address, bitcoin_address='16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM')[0]
         )
         self.tx_out.save()
 
@@ -85,7 +88,7 @@ class TestBlockModel(BaseTestCase):
         self.assertEqual(self.tx.hash, 'a705dac9b33a88d64fbe10f353a20051bdf8a717c84b981cb88591023c3e09ad')
         self.assertEqual(self.tx.version, 1)
         self.assertEqual(self.tx.lock_time, 0)
-        self.assertEqual(self.tx.block, self.block)
+        self.assertEqual(self.tx.block[0], self.block)
         self.assertEqual(self.tx.size, 289)
         self.assertEqual(self.tx.position, 150)
 
@@ -102,9 +105,14 @@ class TestBlockModel(BaseTestCase):
         self.assertEqual(self.tx_out.coin_value, 5000000000)
         self.assertEqual(self.tx_out.script, '4104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac')
 
+    def test_address(self):
+        addresses = Address.query.all()
+        self.assertEqual(len(addresses), 1)
+        self.assertEqual(addresses[0].bitcoin_address, '16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM')
+
     def test_tx_in_with_link_on_out(self):
 
-        tx_in_with_link_on_out = TxIns(
+        tx_in_with_link_on_out = TxIn(
             transaction=self.tx,
             position=11,
             sequence='4294967295',
