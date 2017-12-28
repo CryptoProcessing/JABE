@@ -65,7 +65,6 @@ class Block(db.Model):
     height = db.Column(db.Integer, nullable=False, index=True)
 
 
-# TODO: many-to-many relationship with block
 class Transaction(db.Model):
     """ Transactions Model """
     __tablename__ = "transactions"

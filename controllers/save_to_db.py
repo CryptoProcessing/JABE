@@ -21,6 +21,7 @@ def tx_in_to_db(txs_ins, tx_db):
     :param tx_db:
     :return:
     """
+
     tx_ins = [save_tx_in_db(itn, tx_db, txin) for itn, txin in enumerate(txs_ins)]
     db.session.add_all(tx_ins)
 
@@ -33,11 +34,13 @@ def save_tx_in_db(itn, tx_db, txin):
     :param txin:
     :return:
     """
-    prev_tx = Transaction.query.filter_by(hash=str(txin.previous_hash)).first()
-    if prev_tx:
-        previous_out = TxOut.query.filter_by(transaction=prev_tx, position=txin.previous_index).first()
-    else:
-        previous_out = None
+    previous_out = TxOut.query.join(Transaction).filter(
+        Transaction.hash == str(txin.previous_hash),
+        TxOut.position == txin.previous_index)\
+        .first()
+
+    # previous_out =
+
     tx_in = TxIn(
         transaction=tx_db,
         position=itn,
