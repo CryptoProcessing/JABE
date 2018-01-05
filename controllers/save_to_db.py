@@ -39,8 +39,6 @@ def save_tx_in_db(itn, tx_db, txin):
         TxOut.position == txin.previous_index)\
         .first()
 
-    # previous_out =
-
     tx_in = TxIn(
         transaction=tx_db,
         position=itn,
@@ -52,6 +50,13 @@ def save_tx_in_db(itn, tx_db, txin):
     return tx_in
 
 
+def get_address(txout):
+    try:
+        return txout.address()
+    except:
+        return 'bad script'
+
+
 def tx_out_to_db(txs_ins, tx_db):
     """
     Add transaction out to DB
@@ -60,6 +65,7 @@ def tx_out_to_db(txs_ins, tx_db):
     :return:
     # """
     # txouts = []
+
     txouts = [
         TxOut(
             transaction=tx_db,
@@ -69,8 +75,8 @@ def tx_out_to_db(txs_ins, tx_db):
             address=get_one_or_create(
                 db.session,
                 Address,
-                bitcoin_address=txout.address()
-                    if ('nulldata' not in txout.address()) else "(unknown)")[0]
+                bitcoin_address=get_address(txout)
+                    if ('nulldata' not in get_address(txout)) else "(unknown)")[0]
         ) for ito, txout in enumerate(txs_ins)
     ]
 
