@@ -75,8 +75,7 @@ def tx_out_to_db(txs_ins, tx_db):
             address=get_one_or_create(
                 db.session,
                 Address,
-                bitcoin_address=get_address(txout)
-                    if ('nulldata' not in get_address(txout)) else "(unknown)")[0]
+                bitcoin_address=get_address(txout))[0]
         ) for ito, txout in enumerate(txs_ins)
     ]
 
