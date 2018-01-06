@@ -10,7 +10,7 @@ def split_list(a_list, count=None):
     if not count:
         count = os.cpu_count()
 
-    if len(a_list) < count*10:
+    if len(a_list) < count*20:
         count = 1
 
     splitted_list = []

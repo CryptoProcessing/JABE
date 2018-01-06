@@ -2,6 +2,8 @@ from flask import Flask, Blueprint
 from models import db
 from extensions import rest_api, celery
 from controllers.api_controller import BitcoinNodeApi
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 
 def create_app(object_name):
@@ -14,6 +16,14 @@ def create_app(object_name):
     # init celery
     celery.init_app(app)
 
+    db_engine = create_engine(app.config.get('SQLALCHEMY_DATABASE_URI'), echo=False)
+    DBSession = scoped_session(
+        sessionmaker(
+            autoflush=True,
+            autocommit=False,
+            bind=db_engine
+        )
+    )
 
     # define the API resources
     block_notify_view = BitcoinNodeApi.as_view('block_notify_view')

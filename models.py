@@ -2,6 +2,7 @@ import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 
 def init_db(db):
@@ -24,12 +25,13 @@ def get_one_or_create(session,
                       **kwargs):
     try:
         return session.query(model).filter_by(**kwargs).one(), True
+
     except NoResultFound:
         kwargs.update(create_method_kwargs or {})
         try:
             with session.begin_nested():
                 created = getattr(model, create_method, model)(**kwargs)
-                session.add(created)
+                # session.add(created)
             return created, False
         except IntegrityError:
             return session.query(model).filter_by(**kwargs).one(), True
@@ -102,7 +104,7 @@ class TxOut(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tx_id = db.Column(db.Integer, db.ForeignKey('transactions.id'), nullable=False)
     address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'), nullable=False)
-    position = db.Column(db.Integer, nullable=False)
+    position = db.Column(db.Integer, nullable=False, index=True)
     outs = db.relationship('TxIn', backref='previous', lazy=True, uselist=False) # parent
     coin_value = db.Column(db.Numeric(30), nullable=False)
     script = db.Column(db.Text, nullable=False)
@@ -118,5 +120,5 @@ class Address(db.Model):
     __tablename__ = "addresses"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    bitcoin_address = db.Column(db.String(100), nullable=False, index=True)
+    bitcoin_address = db.Column(db.String(500), nullable=False, index=True)
     tx_outs = db.relationship('TxOut', backref='address', lazy=True)
