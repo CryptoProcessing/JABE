@@ -5,11 +5,15 @@ from . import bitcoin
 from .save_to_db import block_to_db, get_max_height
 from extensions import celery
 from models import Lock
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
+from flask import current_app
+from sqlalchemy.pool import QueuePool
 
 
 def find_block_info():
 
-    db_block_height = get_max_height()
+    db_block_height = 400000 # get_max_height()
     # assert 0==1
     blockcount = bitcoin.get_blockcount()
 
