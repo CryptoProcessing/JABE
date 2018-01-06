@@ -1,5 +1,4 @@
 import threading
-import multiprocessing
 import datetime
 from models import db, Block, Transaction, TxOut, TxIn, Address, get_one_or_create
 from sqlalchemy.sql import func
