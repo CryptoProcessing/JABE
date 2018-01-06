@@ -1,4 +1,5 @@
 import threading
+import multiprocessing
 import datetime
 from models import db, Block, Transaction, TxOut, TxIn, Address, get_one_or_create
 from sqlalchemy.sql import func
@@ -62,7 +63,7 @@ def block_to_db(block_object, height):
     processes = []
 
     for i in range(len(splitted_list)):
-        process = TxProcess(splitted_list[i][0], block.id, i)
+        process = TxProcess(splitted_list[i][0], block.id, splitted_list[i][1])
         processes.append(process)
         process.start()
 

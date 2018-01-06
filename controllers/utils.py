@@ -17,8 +17,8 @@ def split_list(a_list, count=None):
     half = len(a_list) // count
 
     for i in range(count-1):
-        splitted_list.append((a_list[i*half:half+i*half], i))
+        splitted_list.append((a_list[i*half:half+i*half], i*half))
 
-    splitted_list.append((a_list[half+(count-2)*half:], count-1))
+    splitted_list.append((a_list[half+(count-2)*half:], (count-1)*half))
 
     return splitted_list
