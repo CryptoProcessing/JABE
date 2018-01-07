@@ -1,8 +1,6 @@
-import threading
-import datetime
 from models import db, Block, Transaction, TxOut, TxIn, Address, get_one_or_create
 from sqlalchemy.sql import func
-from controllers.utils import split_list
+from sqlalchemy import and_, or_
 
 
 def get_max_height():
@@ -47,41 +45,54 @@ def block_to_db(block_object, height):
     )
     db.session.add(block)
 
+    # build dict of outs
+    outs_dict = transaction_out_to_dict(block_object)
+
     # create all block address
-    list_of_lists = [tx.txs_out for tx in block_object.txs]
-    address_set = set([get_address_name(item) for l in list_of_lists for item in l])
-    address_list = [get_one_or_create(db.session, Address, bitcoin_address=item)[0] for item in address_set]
-    db.session.add_all(address_list)
+    address_dict = address_solve(block_object)
 
-    print('address list created  {}'.format(datetime.datetime.now()))
+    db.session.add_all(list(address_dict.values()))
 
-    db.session.commit()
-
-    splitted_list = split_list(block_object.txs)
-
-    processes = []
-
-    for i in range(len(splitted_list)):
-        process = TxProcess(splitted_list[i][0], block.id, splitted_list[i][1])
-        processes.append(process)
-        process.start()
-
-    for process in processes:
-        process.join()
+    process = TxProcess(block_object.txs, block, numerate_start=0, address_dict=address_dict, outs_dict=outs_dict)
+    process.run()
 
     db.session.commit()
 
     return len(block_object.txs)
 
 
-class TxProcess(threading.Thread):
+def transaction_out_to_dict(block_object):
+    # list of transaction ins from block
+    list_ins = [tx.txs_in for tx in block_object.txs]
+    # condition for query
+    cond = or_(*[and_(Transaction.hash == str(item.previous_hash), TxOut.position == item.previous_index)
+                 for l in list_ins for item in l])
+    # build dictionary of db Outs
+    outs_dict = {'{}_{}'.format(f.position, f.transaction.hash): f for f in
+                 TxOut.query.join(Transaction).filter(cond).all()}
 
-    def __init__(self, tx_list, block, numerate_start):
+    return outs_dict
+
+
+def address_solve(block_object):
+    # all outs
+    list_of_lists = [tx.txs_out for tx in block_object.txs]
+    # set of addresses
+    address_set = set([get_address_name(item) for l in list_of_lists for item in l])
+    # check addres in db
+    address_dict = {item: get_one_or_create(db.session, Address, bitcoin_address=item)[0] for item in address_set}
+
+    return address_dict
+
+
+class TxProcess:
+
+    def __init__(self, tx_list, block, numerate_start, address_dict, outs_dict):
         self.tx_list = tx_list,
         self.block = block
         self.numerate_start = numerate_start
-
-        super(TxProcess, self).__init__()
+        self.address_dict = address_dict
+        self.outs_dict = outs_dict
 
     def tx_in_to_db(self, txs_ins, tx_db):
         """
@@ -102,10 +113,7 @@ class TxProcess(threading.Thread):
         :param txin:
         :return:
         """
-        previous_out = TxOut.query.join(Transaction).filter(
-            Transaction.hash == str(txin.previous_hash),
-            TxOut.position == txin.previous_index)\
-            .first()
+        previous_out = self.get_previous_out(txin)
 
         tx_in = TxIn(
             transaction=tx_db,
@@ -117,6 +125,31 @@ class TxProcess(threading.Thread):
 
         return tx_in
 
+    def get_previous_out(self, txin):
+        """
+        return previous out
+        :param txin:
+        :return:
+        """
+        # coinbase transaction
+        if str(txin.previous_hash) == '0000000000000000000000000000000000000000000000000000000000000000':
+            return None
+
+        # 1. search in dict
+        previous_out = self.outs_dict.get('{}_{}'.format(txin.previous_index, str(txin.previous_hash)))
+
+        # if not find, search in db, maybe txin in the same block
+        if not previous_out:
+            previous_out = TxOut.query.join(Transaction).filter(
+                Transaction.hash == str(txin.previous_hash),
+                TxOut.position == txin.previous_index) \
+                .first()
+
+        return previous_out
+
+    def _get_address_from_dict(self,txout):
+        return self.address_dict[get_address_name(txout)]
+
     def tx_out_to_db(self, txs_ins, tx_db):
         """
         Add transaction out to DB
@@ -124,14 +157,13 @@ class TxProcess(threading.Thread):
         :param tx_db:
         :return:
         # """
-        # txouts = []
         txouts = [
             TxOut(
                 transaction=tx_db,
                 position=ito,
                 coin_value=txout.coin_value,
                 script=txout.script.hex(),
-                address=Address.query.filter_by(bitcoin_address=get_address_name(txout)).one()
+                address=self._get_address_from_dict(txout)
             ) for ito, txout in enumerate(txs_ins)
         ]
 
@@ -144,7 +176,6 @@ class TxProcess(threading.Thread):
         :param block:
         :return:
         """
-        block = Block.query.get(block)
 
         list_txs = [self.save_tx_to_db(block, itx + numerate_start, tx) for itx, tx in enumerate(txs[0])]
 
