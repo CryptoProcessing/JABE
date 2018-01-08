@@ -90,7 +90,7 @@ def address_solve(block_object):
 class TxProcess:
 
     def __init__(self, tx_list, block, numerate_start, address_dict, outs_dict):
-        self.tx_list = tx_list,
+        self.tx_list = tx_list
         self.block = block
         self.numerate_start = numerate_start
         self.address_dict = address_dict
@@ -181,7 +181,7 @@ class TxProcess:
         :return:
         """
 
-        list_txs = [self.save_tx_to_db(block, itx + numerate_start, tx) for itx, tx in enumerate(txs[0])]
+        list_txs = [self.save_tx_to_db(block, itx + numerate_start, tx) for itx, tx in enumerate(txs)]
 
         db.session.add_all([item for l in list_txs for item in l])
         db.session.commit()
