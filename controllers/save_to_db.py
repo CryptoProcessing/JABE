@@ -1,7 +1,7 @@
 from models import db, Block, Transaction, TxOut, TxIn, Address, get_one_or_create
 from sqlalchemy.sql import func
 from sqlalchemy import and_, or_
-
+import datetime
 
 def get_max_height():
     """
@@ -46,13 +46,14 @@ def block_to_db(block_object, height):
     db.session.add(block)
 
     # build dict of outs
+    # print('transaction to dict start {}'.format(datetime.datetime.now()))
     outs_dict = transaction_out_to_dict(block_object)
-
+    # print('address start {}'.format(datetime.datetime.now()))
     # create all block address
     address_dict = address_solve(block_object)
-
+    # print('address finish {}'.format(datetime.datetime.now()))
     db.session.add_all(list(address_dict.values()))
-
+    # print('TX process start {}'.format(datetime.datetime.now()))
     process = TxProcess(block_object.txs, block, numerate_start=0, address_dict=address_dict, outs_dict=outs_dict)
     process.run()
 
@@ -75,6 +76,7 @@ def transaction_out_to_dict(block_object):
 
 
 def address_solve(block_object):
+
     # all outs
     list_of_lists = [tx.txs_out for tx in block_object.txs]
     # set of addresses
@@ -103,7 +105,8 @@ class TxProcess:
         """
 
         tx_ins = [self.save_tx_in_db(itn, tx_db, txin) for itn, txin in enumerate(txs_ins)]
-        db.session.add_all(tx_ins)
+        # db.session.add_all(tx_ins)
+        return tx_ins
 
     def save_tx_in_db(self, itn, tx_db, txin):
         """
@@ -167,7 +170,8 @@ class TxProcess:
             ) for ito, txout in enumerate(txs_ins)
         ]
 
-        db.session.add_all(txouts)
+        return txouts
+            # db.session.add_all(txouts)
 
     def tx_to_db(self, txs, block, numerate_start=0):
         """
@@ -179,7 +183,7 @@ class TxProcess:
 
         list_txs = [self.save_tx_to_db(block, itx + numerate_start, tx) for itx, tx in enumerate(txs[0])]
 
-        db.session.add_all(list_txs)
+        db.session.add_all([item for l in list_txs for item in l])
         db.session.commit()
 
     def save_tx_to_db(self, block, itx, tx):
@@ -190,6 +194,9 @@ class TxProcess:
         :param tx:
         :return:
         """
+
+        db_obj = []
+
         tx_db = Transaction(
             hash=tx.w_id(),
             version=tx.version,
@@ -200,10 +207,10 @@ class TxProcess:
 
         block.transactions.append(tx_db)
 
-        self.tx_in_to_db(tx.txs_in, tx_db)
-        self.tx_out_to_db(tx.txs_out, tx_db)
-
-        return tx_db
+        db_obj.extend(self.tx_in_to_db(tx.txs_in, tx_db))
+        db_obj.extend(self.tx_out_to_db(tx.txs_out, tx_db))
+        db_obj.append(tx_db)
+        return db_obj
 
     def run(self):
         self.tx_to_db(txs=self.tx_list, block=self.block, numerate_start=self.numerate_start)
