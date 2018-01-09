@@ -104,7 +104,7 @@ class TxOut(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tx_id = db.Column(db.Integer, db.ForeignKey('transactions.id'), nullable=False)
     address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'), nullable=False)
-    position = db.Column(db.Integer, nullable=False, index=True)
+    position = db.Column(db.Integer, nullable=False)
     outs = db.relationship('TxIn', backref='previous', lazy=True, uselist=False) # parent
     coin_value = db.Column(db.Numeric(30), nullable=False)
     script = db.Column(db.Text, nullable=False)

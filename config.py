@@ -10,7 +10,7 @@ class ProdConfig(Config):
     MYSQL = {
         'user': 'jabe',
         'pw': 'jabe',
-        'db': 'jabe',
+        'db': 'jabe_db',
         'host': 'localhost',
         'port': '3306',
     }
@@ -24,7 +24,7 @@ class DevConfig(Config):
     MYSQL = {
         'user': 'jabe',
         'pw': 'jabe',
-        'db': 'jabe',
+        'db': 'jabe_db',
         'host': 'localhost',
         'port': '3306',
     }
