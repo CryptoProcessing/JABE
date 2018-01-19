@@ -48,12 +48,12 @@ def block_to_db(block_object, height):
     # build dict of outs
     # print('transaction to dict start {}'.format(datetime.datetime.now()))
     # outs_dict = transaction_out_to_dict(block_object)
-    print('address start {}'.format(datetime.datetime.now()))
+    # print('address start {}'.format(datetime.datetime.now()))
     # create all block address
     address_dict = address_solve(block_object)
-    print('address finish {}'.format(datetime.datetime.now()))
+    # print('address finish {}'.format(datetime.datetime.now()))
     db.session.add_all(list(address_dict.values()))
-    print('TX process start {}'.format(datetime.datetime.now()))
+    # print('TX process start {}'.format(datetime.datetime.now()))
     process = TxProcess(block_object.txs, block, numerate_start=0, address_dict=address_dict) #, outs_dict=outs_dict)
     process.run()
 
