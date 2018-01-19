@@ -24,7 +24,11 @@ def get_one_or_create(session,
                       create_method_kwargs=None,
                       **kwargs):
     try:
+        print(**kwargs)
         return session.query(model).filter_by(**kwargs).one(), True
+
+    except MultipleResultsFound:
+        raise
 
     except NoResultFound:
         kwargs.update(create_method_kwargs or {})
@@ -35,6 +39,20 @@ def get_one_or_create(session,
             return created, False
         except IntegrityError:
             return session.query(model).filter_by(**kwargs).one(), True
+
+
+def get_or_create_address(bitcoin_address):
+    try:
+        return Address.query.filter_by(bitcoin_address=bitcoin_address).one()
+
+    except NoResultFound:
+        return Address(
+            bitcoin_address=bitcoin_address
+        )
+
+    except MultipleResultsFound:
+        print('double {}'.format(bitcoin_address))
+        return Address.query.filter_by(bitcoin_address=bitcoin_address).first()
 
 
 block_tx = db.Table('block_tx',
