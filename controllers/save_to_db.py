@@ -3,6 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy import and_, or_
 import datetime
 
+
 def get_max_height():
     """
     Return Max block height value from db
@@ -156,7 +157,7 @@ class TxProcess:
         # return get_or_create_address(bitcoin_address=get_address_name(txout))
         return self.address_dict[get_address_name(txout)]
 
-    def tx_out_to_db(self, txs_ins, tx_db):
+    def tx_out_to_db(self, txs_outs, tx_db):
         """
         Add transaction out to DB
         :param txs_ins:
@@ -170,7 +171,7 @@ class TxProcess:
                 coin_value=txout.coin_value,
                 script=txout.script.hex(),
                 address=self._get_address_from_dict(txout)
-            ) for ito, txout in enumerate(txs_ins)
+            ) for ito, txout in enumerate(txs_outs)
         ]
 
         return txouts
@@ -200,7 +201,7 @@ class TxProcess:
         db_obj = []
 
         tx_db = Transaction(
-            hash=tx.w_id(),
+            hash=tx.id(),
             version=tx.version,
             lock_time=tx.lock_time,
             size=len(tx.as_bin()),
