@@ -1,4 +1,5 @@
-##Create DB and user
+## Create DB and user
+
 ```bash
 mysql -u root -p
 ```
@@ -60,8 +61,11 @@ ps xa | grep gunicorn
 
 
 
-## start celery deamon
+## start celery daemon
 
+```
+celery worker -A celery_worker.celery --loglevel=info
+```
 https://github.com/celery/celery/tree/master/extra/generic-init.d
 
 ```bash
@@ -78,7 +82,7 @@ $ sudo /etc/init.d/celeryd status
 Остановка
 $ sudo /etc/init.
 ```
-##nginx
+## nginx
 
 ```bash
 ln -s /home/melaman/JABE/nginx_jabe.conf /etc/nginx/sites-available/nginx_jabe.conf

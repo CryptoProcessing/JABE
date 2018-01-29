@@ -55,7 +55,6 @@ def block_to_db(block_object, height):
     process.run()
 
     db.session.commit()
-
     return len(block_object.txs)
 
 

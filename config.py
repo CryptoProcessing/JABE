@@ -2,15 +2,14 @@
 class Config(object):
     SECRET_KEY = 'e21fa0fa3e0d28505c5d1b795495b2ee08420c71d036a9e2dee04cd0818ba70e'
 
-    CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
-    CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
+    CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
 
 class ProdConfig(Config):
     MYSQL = {
         'user': 'jabe',
         'pw': 'jabe',
-        'db': 'jabe_db',
+        'db': 'jabe',
         'host': 'localhost',
         'port': '3306',
     }
@@ -24,7 +23,7 @@ class DevConfig(Config):
     MYSQL = {
         'user': 'jabe',
         'pw': 'jabe',
-        'db': 'jabe_db',
+        'db': 'jabe',
         'host': 'localhost',
         'port': '3306',
     }

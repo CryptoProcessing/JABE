@@ -24,7 +24,6 @@ def get_one_or_create(session,
                       create_method_kwargs=None,
                       **kwargs):
     try:
-        print(**kwargs)
         return session.query(model).filter_by(**kwargs).one(), True
 
     except MultipleResultsFound:
