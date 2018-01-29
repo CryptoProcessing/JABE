@@ -3,7 +3,6 @@ import io
 from pycoin.block import Block as BlockObject
 from pycoin.serialize import h2b
 
-
 from models import db, Block, Transaction, TxIn, TxOut
 from tests.base import BaseTestCase
 from controllers.save_to_db import block_to_db, get_max_height

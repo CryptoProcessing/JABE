@@ -47,15 +47,11 @@ def block_to_db(block_object, height):
     db.session.add(block)
 
     # build dict of outs
-    # print('transaction to dict start {}'.format(datetime.datetime.now()))
     # outs_dict = transaction_out_to_dict(block_object)
-    # print('address start {}'.format(datetime.datetime.now()))
     # create all block address
     address_dict = address_solve(block_object)
-    # print('address finish {}'.format(datetime.datetime.now()))
     db.session.add_all(list(address_dict.values()))
-    # print('TX process start {}'.format(datetime.datetime.now()))
-    process = TxProcess(block_object.txs, block, numerate_start=0, address_dict=address_dict) #, outs_dict=outs_dict)
+    process = TxProcess(block_object.txs, block, address_dict=address_dict)
     process.run()
 
     db.session.commit()
@@ -71,9 +67,9 @@ def transaction_out_to_dict(block_object):
                  for l in list_ins for item in l])
     query_result = TxOut.query.join(Transaction).filter(cond)
     # build dictionary of db Outs
-    # outs_dict = {'{}_{}'.format(f.position, f.transaction.hash): f for f in query_result}
+    outs_dict = {'{}_{}'.format(f.position, f.transaction.hash): f for f in query_result}
 
-    return query_result
+    return outs_dict
 
 
 def address_solve(block_object):
@@ -91,12 +87,10 @@ def address_solve(block_object):
 
 class TxProcess:
 
-    def __init__(self, tx_list, block, numerate_start, address_dict): #, outs_dict):
+    def __init__(self, tx_list, block, address_dict):
         self.tx_list = tx_list
         self.block = block
-        self.numerate_start = numerate_start
         self.address_dict = address_dict
-        # self.outs_dict = outs_dict
 
     def tx_in_to_db(self, txs_ins, tx_db):
         """
@@ -176,7 +170,7 @@ class TxProcess:
 
         return txouts
 
-    def tx_to_db(self, txs, block, numerate_start=0):
+    def tx_to_db(self, txs, block):
         """
         Add all transaction outs to DB
         :param txs:
@@ -216,5 +210,5 @@ class TxProcess:
         return db_obj
 
     def run(self):
-        self.tx_to_db(txs=self.tx_list, block=self.block, numerate_start=self.numerate_start)
+        self.tx_to_db(txs=self.tx_list, block=self.block)
 

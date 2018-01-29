@@ -10,8 +10,8 @@ from models import Lock
 
 def find_block_info():
 
-    db_block_height = 500000 # get_max_height()
-    # assert 0==1
+    db_block_height = get_max_height()
+
     blockcount = bitcoin.get_blockcount()
 
     while blockcount > db_block_height:
