@@ -1,8 +1,20 @@
+from kombu import Queue, Exchange
+
 
 class Config(object):
     SECRET_KEY = 'e21fa0fa3e0d28505c5d1b795495b2ee08420c71d036a9e2dee04cd0818ba70e'
 
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
+
+    CELERY_QUEUES = (
+        Queue('block', Exchange('block'), routing_key='block'),
+        Queue('tx', Exchange('tx'), routing_key='tx')
+    )
+
+    CELERY_ROUTES = {
+        'controllers.tasks.block_checker': {'queue': 'block'},
+        'controllers.tasks.find_previous': {'queue': 'tx'},
+    }
 
 
 class ProdConfig(Config):
@@ -18,6 +30,7 @@ class ProdConfig(Config):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_POOL_RECYCLE = 299
     SQLALCHEMY_POOL_TIMEOUT = 20
+
 
 class DevConfig(Config):
     DEBUG = False
