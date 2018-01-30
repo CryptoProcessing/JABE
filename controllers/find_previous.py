@@ -33,7 +33,7 @@ class FindProcess:
             tx_obj = Transaction.query.filter_by(hash=str(tx.hash())).first()
             if not tx_obj:
                 print(tx.hash())
-                tx_obj = Transaction.query.filter_by(hash=str(tx.hash())).first()
+                continue
             for ix, txin in enumerate(tx.txs_in):
                 if str(txin.previous_hash) == '0000000000000000000000000000000000000000000000000000000000000000':
                     continue
