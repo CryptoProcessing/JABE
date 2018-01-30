@@ -9,14 +9,15 @@ class ProdConfig(Config):
     MYSQL = {
         'user': 'jabe',
         'pw': 'jabe',
-        'db': 'jabe',
+        'db': 'jabe_db',
         'host': 'localhost',
         'port': '3306',
     }
     BCRYPT_LOG_ROUNDS = 13
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % MYSQL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
+    SQLALCHEMY_POOL_RECYCLE = 299
+    SQLALCHEMY_POOL_TIMEOUT = 20
 
 class DevConfig(Config):
     DEBUG = False
