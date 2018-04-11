@@ -57,18 +57,18 @@ def block_to_db(block_object, height):
     db.session.commit()
     return len(block_object.txs)
 
-
-def transaction_out_to_dict(block_object):
-    # list of transaction ins from block
-    list_ins = [tx.txs_in for tx in block_object.txs]
-    # condition for query
-    cond = or_(*[and_(Transaction.hash == str(item.previous_hash), TxOut.position == item.previous_index)
-                 for l in list_ins for item in l])
-    query_result = TxOut.query.join(Transaction).filter(cond)
-    # build dictionary of db Outs
-    outs_dict = {'{}_{}'.format(f.position, f.transaction.hash): f for f in query_result}
-
-    return outs_dict
+#
+# def transaction_out_to_dict(block_object):
+#     # list of transaction ins from block
+#     list_ins = [tx.txs_in for tx in block_object.txs]
+#     # condition for query
+#     cond = or_(*[and_(Transaction.hash == str(item.previous_hash), TxOut.position == item.previous_index)
+#                  for l in list_ins for item in l])
+#     query_result = TxOut.query.join(Transaction).filter(cond)
+#     # build dictionary of db Outs
+#     outs_dict = {'{}_{}'.format(f.position, f.transaction.hash): f for f in query_result}
+#
+#     return outs_dict
 
 
 def address_solve(block_object):
@@ -111,8 +111,8 @@ class TxProcess:
         :param txin:
         :return:
         """
-        # previous_out = self.get_previous_out(txin)
-        previous_out = None
+        previous_out = self.get_previous_out(txin)
+        # previous_out = None
         tx_in = TxIn(
             transaction=tx_db,
             position=itn,
@@ -130,9 +130,9 @@ class TxProcess:
         :return:
         """
         # coinbase transaction
-        # if str(txin.previous_hash) == '0000000000000000000000000000000000000000000000000000000000000000':
-        #     print('coinbase')
-        #     return None
+        if str(txin.previous_hash) == '0000000000000000000000000000000000000000000000000000000000000000':
+            print('coinbase')
+            return None
 
         # 1. search in dict
         # previous_out = self.outs_dict.get('{}_{}'.format(txin.previous_index, str(txin.previous_hash)))

@@ -86,3 +86,10 @@ $ sudo /etc/init.
 
 ```bash
 ln -s /home/melaman/JABE/nginx_jabe.conf /etc/nginx/sites-available/nginx_jabe.conf
+```
+```bash
+python manage.py findprevious -b 250000 -s 25000
+```
+
+
+
