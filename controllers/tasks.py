@@ -1,11 +1,10 @@
 import os
 import datetime
-from flask import current_app
 from JABE import create_app, make_celery
 from controllers import bitcoin
 from controllers.save_to_db import block_to_db, get_max_height
 from controllers.find_previous import find_previous_in_block
-from models import Lock
+from models import Lock, db
 
 
 env = os.environ.get('JABE_ENV', 'dev')
@@ -25,6 +24,7 @@ def find_block_info():
         tr_count = block_to_db(block_object, block_height)
 
         print(block_height, tr_count,  datetime.datetime.now())
+    print('all blocks parsed')
 
 
 @celery.task()
@@ -35,6 +35,7 @@ def block_checker():
     find_block_info()
 
     Lock.query.delete()
+    db.session.commit()
 
 
 @celery.task()
