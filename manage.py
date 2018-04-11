@@ -4,7 +4,7 @@ import os
 import unittest
 from flask_script import Manager, Server
 from flask_migrate import Migrate, MigrateCommand
-
+from controllers.tasks import find_previous
 from JABE import create_app
 from models import db
 
@@ -25,6 +25,15 @@ def make_shell_context():
         app=app,
 
     )
+
+
+@manager.option('-s', '--shift', dest='shift', default=None)
+@manager.option('-b', '--startblock', dest='start_block', default=None)
+def findprevious(start_block, shift):
+    print(start_block)
+    print('shift {}'.format(shift))
+    find_previous.delay(start_block=start_block, block_shift=shift)
+    return 1
 
 
 @manager.command

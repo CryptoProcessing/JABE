@@ -38,13 +38,17 @@ def block_checker():
 
 
 @celery.task()
-def find_previous():
+def find_previous(start_block, block_shift):
 
-    db_block_height = 280000
+    db_block_height = int(start_block)
     # assert 0==1
-    blockcount_in_db = get_max_height()
 
-    while blockcount_in_db > db_block_height:
+    if block_shift:
+        blockcount = db_block_height + int(block_shift)
+    else:
+        blockcount = get_max_height()
+
+    while blockcount > db_block_height:
         db_block_height += 1
         block_hash = bitcoin.get_block_hash(db_block_height)
         block_object, block_height = bitcoin.get_block(block_hash)

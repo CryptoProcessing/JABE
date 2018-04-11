@@ -1,7 +1,7 @@
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 from models import Lock
-from controllers.tasks import block_checker, find_previous
+from controllers.tasks import block_checker
 
 
 class BitcoinNodeApi(MethodView):
@@ -14,13 +14,4 @@ class BitcoinNodeApi(MethodView):
             block_checker.delay()
         else:
             print("Locked")
-        return make_response(jsonify('')), 200
-
-
-class ApiFindPrevious(MethodView):
-    """ Bitcoin block notification """
-
-    def get(self, **kwargs):
-        find_previous.delay()
-
         return make_response(jsonify('')), 200
