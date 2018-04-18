@@ -4,7 +4,7 @@ import os
 import unittest
 from flask_script import Manager, Server
 from flask_migrate import Migrate, MigrateCommand
-from controllers.tasks import find_previous
+from controllers.tasks import find_previous, task_repair_transactions
 from JABE import create_app
 from models import db
 
@@ -34,6 +34,11 @@ def findprevious(start_block, shift):
     print('shift {}'.format(shift))
     find_previous.delay(start_block=start_block, block_shift=shift)
     return 1
+
+
+@manager.command
+def repairtransactions():
+    task_repair_transactions()
 
 
 @manager.command
