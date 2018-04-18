@@ -45,9 +45,11 @@ def get_or_create_address(bitcoin_address):
         return Address.query.filter_by(bitcoin_address=bitcoin_address).one()
 
     except NoResultFound:
-        return Address(
+        address = Address(
             bitcoin_address=bitcoin_address
         )
+        db.session.add(address)
+        return address
 
     except MultipleResultsFound:
         print('double {}'.format(bitcoin_address))
