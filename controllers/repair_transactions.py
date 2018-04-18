@@ -1,4 +1,5 @@
 from models import db, Transaction, TxOut, TxIn, Block, block_tx
+from .save_to_db import address_solve, TxProcess
 
 
 def repair_transactions(block_object, height):
@@ -10,7 +11,7 @@ def repair_transactions(block_object, height):
 
     db_block = Block.query.filter_by(height=height).one()
 
-    transaction = Transaction.query.filter(Transaction.block.any(Transaction.block.any(id=db_block.id))).all()
+    transaction = Transaction.query.filter(Transaction.block.any(id=db_block.id)).all()
 
     # process = RepairTransaction(block_object.txs)
     # process.run()
@@ -18,7 +19,14 @@ def repair_transactions(block_object, height):
     # db.session.commit()
     #
     if not transaction:
-        print(height)
+        print('add {}'.format(height))
+        address_dict = address_solve(block_object)
+        db.session.add_all(list(address_dict.values()))
+        process = TxProcess(block_object.txs, db_block, address_dict=address_dict)
+        process.run()
+
+        db.session.commit()
+        return len(block_object.txs)
     # return len(block_object.txs)
 
 

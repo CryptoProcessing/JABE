@@ -29,9 +29,9 @@ def find_block_info():
 
 
 def task_repair_transactions():
-    db_block_height = 20
+    db_block_height = 220000
 
-    blockcount = bitcoin.get_blockcount()
+    blockcount = 220002  #bitcoin.get_blockcount()
 
     while blockcount > db_block_height:
         db_block_height += 1
