@@ -4,6 +4,7 @@ from JABE import create_app, make_celery
 from controllers import bitcoin
 from controllers.save_to_db import block_to_db, get_max_height
 from controllers.find_previous import find_previous_in_block
+from controllers.repair_transactions import repair_transactions
 from models import Lock, db
 
 
@@ -13,7 +14,7 @@ celery = make_celery(create_app('config.%sConfig' % env.capitalize(), register_b
 
 def find_block_info():
 
-    db_block_height = get_max_height()
+    db_block_height = 515268  # get_max_height()
 
     blockcount = bitcoin.get_blockcount()
 
@@ -25,6 +26,19 @@ def find_block_info():
 
         print(block_height, tr_count,  datetime.datetime.now())
     print('all blocks parsed')
+
+
+def task_repair_transactions():
+    db_block_height = 20
+
+    blockcount = bitcoin.get_blockcount()
+
+    while blockcount > db_block_height:
+        db_block_height += 1
+        block_hash = bitcoin.get_block_hash(db_block_height)
+        block_object, block_height = bitcoin.get_block(block_hash)
+
+        repair_transactions(block_object, block_height)
 
 
 @celery.task()
