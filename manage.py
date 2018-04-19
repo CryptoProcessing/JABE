@@ -38,7 +38,7 @@ def findprevious(start_block, shift):
 
 @manager.command
 def repairtransactions():
-    task_repair_transactions()
+    task_repair_transactions.delay()
 
 
 @manager.command

@@ -28,10 +28,11 @@ def find_block_info():
     print('all blocks parsed')
 
 
+@celery.task()
 def task_repair_transactions():
-    db_block_height = 220000
+    db_block_height = 180000
 
-    blockcount = 220002  #bitcoin.get_blockcount()
+    blockcount = 350000  #bitcoin.get_blockcount()
 
     while blockcount > db_block_height:
         db_block_height += 1
