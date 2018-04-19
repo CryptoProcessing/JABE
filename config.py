@@ -7,14 +7,20 @@ class Config(object):
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
     CELERY_QUEUES = (
+        Queue('default', Exchange('default'), routing_key='default'),
         Queue('block', Exchange('block'), routing_key='block'),
         Queue('tx', Exchange('tx'), routing_key='tx')
     )
 
     CELERY_ROUTES = {
+        'controllers.tasks.*': {'queue': 'default'},
         'controllers.tasks.block_checker': {'queue': 'block'},
         'controllers.tasks.find_previous': {'queue': 'tx'},
     }
+
+    CELERY_TASK_DEFAULT_QUEUE = 'default'
+    CELERY_TASK_DEFAULT_EXCHANGE = 'default'
+    CELERY_TASK_DEFAULT_ROUTING_KEY = 'default'
 
 
 class ProdConfig(Config):
@@ -37,7 +43,7 @@ class DevConfig(Config):
     MYSQL = {
         'user': 'jabe',
         'pw': 'jabe',
-        'db': 'jabe',
+        'db': 'jabe_db',
         'host': 'localhost',
         'port': '3306',
     }
