@@ -25,8 +25,8 @@ class TestBlockChecker(BaseTestCase):
     # @patch('controllers.bitcoin.get_block')
     def test_tx(self):
         # mockedblock.return_value = self.block_object, self.block_height
-        # block_checker.delay()
+        # block_checker()
 
         # tx = self.block.txs[1]
-        self.assertEqual(1, 1)
+        self.assertEqual(1, 2)
         # self.assertEqual(tx.w_id(), 'a705dac9b33a88d64fbe10f353a20051bdf8a717c84b981cb88591023c3e09ad')

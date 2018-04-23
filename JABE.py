@@ -32,6 +32,8 @@ def create_app(object_name, register_blueprints=True):
 
     if register_blueprints:
         from controllers.api_controller import BitcoinNodeApi
+        from controllers.api_controller import UnspentApi
+
         # define the API resources
         block_notify_view = BitcoinNodeApi.as_view('block_notify_view')
 
@@ -45,11 +47,22 @@ def create_app(object_name, register_blueprints=True):
 
         app.register_blueprint(bitcoin_blueprint, url_prefix='/api/v1')
 
+        unspent_view = UnspentApi.as_view('unspent_view')
+
+        blockchain_blueprint = Blueprint('blockchain', __name__)
+        # add Rules for API Endpoints
+        blockchain_blueprint.add_url_rule(
+            '/unspent',
+            view_func=unspent_view,
+            methods=['GET']
+        )
+
+        app.register_blueprint(blockchain_blueprint, url_prefix='/api/v1')
         rest_api.init_app(app)
 
     return app
 
 
 if __name__ == '__main__':
-    app = app = create_app('project.config.ProdConfig')
+    app = create_app('project.config.ProdConfig')
     app.run()
