@@ -78,8 +78,8 @@ def address_solve(block_object):
     # set of addresses
     address_set = set([get_address_name(item) for l in list_of_lists for item in l])
     # check addres in db
-    # address_dict = {item: get_one_or_create(db.session, Address, bitcoin_address=item)[0] for item in address_set}
-    address_dict = {item: get_or_create_address(bitcoin_address=item) for item in address_set}
+    address_dict = {item: get_one_or_create(db.session, Address, bitcoin_address=item)[0] for item in address_set}
+    # address_dict = {item: get_or_create_address(bitcoin_address=item) for item in address_set}
 
     return address_dict
 
@@ -131,13 +131,8 @@ class TxProcess:
         """
         # coinbase transaction
         if str(txin.previous_hash) == '0000000000000000000000000000000000000000000000000000000000000000':
-            print('coinbase')
             return None
 
-        # 1. search in dict
-        # previous_out = self.outs_dict.get('{}_{}'.format(txin.previous_index, str(txin.previous_hash)))
-
-        # if not find, search in db, maybe txin in the same block
         # if not previous_out:
         previous_out = TxOut.query.join(Transaction).filter(
             Transaction.hash == str(txin.previous_hash),
@@ -157,6 +152,7 @@ class TxProcess:
         :param tx_db:
         :return:
         # """
+
         txouts = [
             TxOut(
                 transaction=tx_db,

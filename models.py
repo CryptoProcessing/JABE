@@ -34,7 +34,7 @@ def get_one_or_create(session,
         try:
             with session.begin_nested():
                 created = getattr(model, create_method, model)(**kwargs)
-                # session.add(created)
+                session.add(created)
             return created, False
         except IntegrityError:
             return session.query(model).filter_by(**kwargs).one(), True
