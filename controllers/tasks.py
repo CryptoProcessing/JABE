@@ -14,7 +14,7 @@ celery = make_celery(create_app('config.%sConfig' % env.capitalize(), register_b
 
 def find_block_info():
 
-    db_block_height = 515268  # get_max_height()
+    db_block_height = get_max_height()
 
     blockcount = bitcoin.get_blockcount()
 

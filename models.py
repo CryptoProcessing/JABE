@@ -53,7 +53,7 @@ def get_or_create_address(bitcoin_address):
 
     except MultipleResultsFound:
         print('double {}'.format(bitcoin_address))
-        return Address.query.filter_by(bitcoin_address=bitcoin_address).first()
+        return Address.query.filter_by(bitcoin_address=bitcoin_address).order_by(Address.id).first()
 
 
 block_tx = db.Table('block_tx',
@@ -128,7 +128,13 @@ class TxOut(db.Model):
     coin_value = db.Column(db.Numeric(30), nullable=False)
     script = db.Column(db.Text, nullable=False)
 
-    def get_unspents(self, address):
+    @staticmethod
+    def get_unspents(address):
+        """
+        Return unspent transaction from blockchain by address
+        :param address:
+        :return:
+        """
 
         return TxOut.query.join(Address).filter(Address.bitcoin_address == address, ~TxOut.tx_ins.any()).all()
 
@@ -145,3 +151,12 @@ class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     bitcoin_address = db.Column(db.String(500), nullable=False, index=True)
     tx_outs = db.relationship('TxOut', backref='address', lazy=True)
+
+    def get_balance(self, address):
+
+        # solve all received coins
+        tx = TxOut.query.join(Address).filter(Address.bitcoin_address == address, ~TxOut.tx_ins.any())
+
+        sum_out =sum(int(tx_i.coin_value) for tx_i in tx)
+
+        return sum_out, tx.count()
