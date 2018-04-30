@@ -27,7 +27,9 @@ def get_one_or_create(session,
         return session.query(model).filter_by(**kwargs).one(), True
 
     except MultipleResultsFound:
-        raise
+        print('double'.format(**kwargs))
+        print(** kwargs)
+        return session.query(model).filter_by(**kwargs).order_by(model.id).first()
 
     except NoResultFound:
         kwargs.update(create_method_kwargs or {})
