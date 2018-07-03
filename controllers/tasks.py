@@ -5,7 +5,7 @@ from controllers import bitcoin
 from controllers.save_to_db import block_to_db, get_max_height
 from controllers.find_previous import find_previous_in_block
 from controllers.repair_transactions import repair_transactions
-from models import Lock, db
+from extensions import redis_store
 
 
 env = os.environ.get('JABE_ENV', 'dev')
@@ -25,6 +25,10 @@ def find_block_info():
         tr_count = block_to_db(block_object, block_height)
 
         print(block_height, tr_count,  datetime.datetime.now())
+
+        # update max height
+        db_block_height = get_max_height()
+
     print('all blocks parsed')
 
 
@@ -43,14 +47,21 @@ def task_repair_transactions():
 
 
 @celery.task()
-def block_checker():
-    lock = Lock(lock=True)
-    lock.save()
+def block_checker(block_hash):
+    block_hash = block_hash
+    print(block_hash)
+
+    # maybe parser in progress
+    parced_now = redis_store.get('parsed_block')
+    if parced_now == b'parsing':
+        print('Already parsing...')
+        return None
+
+    redis_store.set('parsed_block', 'parsing')
 
     find_block_info()
 
-    Lock.query.delete()
-    db.session.commit()
+    redis_store.delete('parsed_block')
 
 
 @celery.task()

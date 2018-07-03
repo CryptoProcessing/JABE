@@ -1,8 +1,6 @@
 from flask import Flask, Blueprint
 from models import db
 from extensions import rest_api
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
 
 from celery import Celery
 
@@ -31,23 +29,10 @@ def create_app(object_name, register_blueprints=True):
     db.init_app(app)
 
     if register_blueprints:
-        from controllers.api_controller import BitcoinNodeApi
-        from controllers.api_controller import UnspentApi
-
-        # define the API resources
-        block_notify_view = BitcoinNodeApi.as_view('block_notify_view')
-
-        bitcoin_blueprint = Blueprint('bitcoin', __name__)
-        # add Rules for API Endpoints
-        bitcoin_blueprint.add_url_rule(
-            '/btc/block',
-            view_func=block_notify_view,
-            methods=['POST']
-        )
-
-        app.register_blueprint(bitcoin_blueprint, url_prefix='/api/v1')
+        from controllers.api_controller import UnspentApi, BalanceApi
 
         unspent_view = UnspentApi.as_view('unspent_view')
+        balance_view = BalanceApi.as_view('balance_view')
 
         blockchain_blueprint = Blueprint('blockchain', __name__)
         # add Rules for API Endpoints
@@ -56,7 +41,11 @@ def create_app(object_name, register_blueprints=True):
             view_func=unspent_view,
             methods=['GET']
         )
-
+        blockchain_blueprint.add_url_rule(
+            '/balance',
+            view_func=balance_view,
+            methods=['GET']
+        )
         app.register_blueprint(blockchain_blueprint, url_prefix='/api/v1')
         rest_api.init_app(app)
 

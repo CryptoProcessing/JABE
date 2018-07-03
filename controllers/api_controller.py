@@ -1,20 +1,6 @@
 from flask import request, make_response, jsonify
 from flask.views import MethodView
-from models import Lock, TxOut
-from controllers.tasks import block_checker
-
-
-class BitcoinNodeApi(MethodView):
-    """ Bitcoin block notification """
-
-    def post(self, **kwargs):
-        block_hash = request.data
-        print(block_hash)
-        if not Lock.query.all():
-            block_checker.delay()
-        else:
-            print("Locked")
-        return make_response(jsonify('')), 200
+from models import TxOut, Address
 
 
 class UnspentApi(MethodView):
@@ -36,3 +22,22 @@ class UnspentApi(MethodView):
         unspents = tx_outs.get_unspents(address=address)
 
         return make_response(jsonify(self.json_unspent(unspents))), 200
+
+
+class BalanceApi(MethodView):
+
+    def json_balance(self, balance, tx_count):
+        return {
+                'final_balance': balance,
+                'n_tx': tx_count
+            }
+
+    def get(self, **kwargs):
+        query_string = request.args
+        address = query_string.get('address')
+
+        address_obj = Address()
+
+        balance, tx_count = address_obj.get_balance(address=address)
+
+        return make_response(jsonify({address: self.json_balance(balance, tx_count)})), 200
