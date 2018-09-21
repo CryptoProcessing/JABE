@@ -60,7 +60,7 @@ class ZMQHandler():
             print('- HASH BLOCK ('+sequence+') -')
             try:
                 print('new block')
-                block_checker.delay()
+                block_checker.delay(body)
             except Exception as e:
                 print(e)
 
