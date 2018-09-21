@@ -21,7 +21,7 @@ class FindProcess:
     def __init__(self, tx_list):
         self.tx_list = tx_list
 
-    def find_all_prev(self, txs):
+    def find_all_prev(self):
         """
         Add all transaction outs to DB
         :param txs:
@@ -29,7 +29,7 @@ class FindProcess:
         :return:
         """
 
-        for tx in txs:
+        for tx in self.tx_list:
             tx_obj = Transaction.query.filter_by(hash=str(tx.hash())).first()
             if not tx_obj:
                 print(tx.hash())
@@ -50,6 +50,6 @@ class FindProcess:
                     # print(tx_obj.id, ix)
 
     def run(self):
-        self.find_all_prev(txs=self.tx_list)
+        self.find_all_prev()
 
 

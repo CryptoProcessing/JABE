@@ -59,7 +59,20 @@ celery worker -A celery_worker.celery --loglevel=info
 ```
 or 
 ## start celery daemon
+```bash
 
+sudo systemctl daemon-reload
+sudo systemctl start celery.service
+sudo systemctl restart celery.service
+```
+
+## start nodelistener daemon
+```bash
+
+sudo systemctl daemon-reload
+sudo systemctl start nodelistener.service
+sudo systemctl restart nodelistener.service
+```
 ## nginx
 
 ```bash

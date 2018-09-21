@@ -1,0 +1,18 @@
+[Unit]
+Description=zmq daemon
+After=network.target
+
+[Service]
+PIDFile=/run/zmq/pid
+User=deployer
+Group=deployer
+RuntimeDirectory=zmq
+Restart=on-failure
+WorkingDirectory=/var/JABE
+ExecStart=/var/JABE/bin/python3 zmq_pub.py
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

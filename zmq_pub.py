@@ -60,6 +60,7 @@ class ZMQHandler():
           sequence = str(msgSequence)
         if topic == b"hashblock":
             try:
+                print('new block')
                 block_checker.delay()
             except Exception as e:
                 print(e)

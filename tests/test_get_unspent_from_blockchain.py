@@ -5,10 +5,10 @@ from tests.base import BaseTestCase
 from controllers.api_controller import UnspentApi
 
 
-class TestBlockModel(BaseTestCase):
+class TestUnspentFromBlockchain(BaseTestCase):
 
     def setUp(self):
-        super(TestBlockModel, self).setUp()
+        super(TestUnspentFromBlockchain, self).setUp()
 
         self.test_address = '16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM'
 

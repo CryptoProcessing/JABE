@@ -57,18 +57,18 @@ def block_to_db(block_object, height):
     db.session.commit()
     return len(block_object.txs)
 
-#
-# def transaction_out_to_dict(block_object):
-#     # list of transaction ins from block
-#     list_ins = [tx.txs_in for tx in block_object.txs]
-#     # condition for query
-#     cond = or_(*[and_(Transaction.hash == str(item.previous_hash), TxOut.position == item.previous_index)
-#                  for l in list_ins for item in l])
-#     query_result = TxOut.query.join(Transaction).filter(cond)
-#     # build dictionary of db Outs
-#     outs_dict = {'{}_{}'.format(f.position, f.transaction.hash): f for f in query_result}
-#
-#     return outs_dict
+
+def transaction_out_to_dict(block_object):
+    # list of transaction ins from block
+    list_ins = [tx.txs_in for tx in block_object.txs]
+    # condition for query
+    cond = or_(*[and_(Transaction.hash == str(item.previous_hash), TxOut.position == item.previous_index)
+                 for l in list_ins for item in l])
+    query_result = TxOut.query.join(Transaction).filter(cond)
+    # build dictionary of db Outs
+    outs_dict = {'{}_{}'.format(f.position, f.transaction.hash): f for f in query_result}
+
+    return outs_dict
 
 
 def address_solve(block_object):
@@ -78,8 +78,8 @@ def address_solve(block_object):
     # set of addresses
     address_set = set([get_address_name(item) for l in list_of_lists for item in l])
     # check addres in db
-    address_dict = {item: get_one_or_create(db.session, Address, bitcoin_address=item)[0] for item in address_set}
-    # address_dict = {item: get_or_create_address(bitcoin_address=item) for item in address_set}
+    # address_dict = {item: get_one_or_create(db.session, Address, bitcoin_address=item)[0] for item in address_set}
+    address_dict = {item: get_or_create_address(bitcoin_address=item) for item in address_set}
 
     return address_dict
 
