@@ -39,7 +39,7 @@ def findprevious(start_block, shift):
 @manager.command
 def startparsing():
     print('start parsing')
-    block_checker('first_block')
+    block_checker.delay('first_block')
     return 1
 
 

@@ -5,7 +5,7 @@ from pycoin.block import Block
 from pycoin.serialize import h2b, b2h_rev
 from tenacity import retry, stop_after_attempt
 
-SelectParams("testnet")
+SelectParams("mainnet")
 
 
 class MyProxy(bitcoin.rpc.Proxy):

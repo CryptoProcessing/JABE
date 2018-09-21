@@ -17,7 +17,6 @@ def find_block_info():
     db_block_height = get_max_height()
 
     blockcount = bitcoin.get_blockcount()
-    print(blockcount)
     while blockcount > db_block_height:
         db_block_height += 1
         block_hash = bitcoin.get_block_hash(db_block_height)
