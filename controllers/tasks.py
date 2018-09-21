@@ -8,7 +8,7 @@ from controllers.repair_transactions import repair_transactions
 from extensions import redis_store
 
 
-env = os.environ.get('JABE_ENV', 'dev')
+env = os.environ.get('JABE_ENV', 'prod')
 celery = make_celery(create_app('config.%sConfig' % env.capitalize(), register_blueprints=False))
 
 
