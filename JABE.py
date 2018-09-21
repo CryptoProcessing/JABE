@@ -1,6 +1,6 @@
 from flask import Flask, Blueprint
 from models import db
-from extensions import rest_api
+from extensions import rest_api, redis_store
 
 from celery import Celery
 
@@ -27,6 +27,9 @@ def create_app(object_name, register_blueprints=True):
 
     db.app = app
     db.init_app(app)
+
+    redis_store.init_app(app)
+    redis_store.set('parsed_block', '')
 
     if register_blueprints:
         from controllers.api_controller import UnspentApi, BalanceApi

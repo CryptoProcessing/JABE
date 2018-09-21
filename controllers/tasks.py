@@ -17,7 +17,7 @@ def find_block_info():
     db_block_height = get_max_height()
 
     blockcount = bitcoin.get_blockcount()
-
+    print(blockcount)
     while blockcount > db_block_height:
         db_block_height += 1
         block_hash = bitcoin.get_block_hash(db_block_height)
@@ -48,9 +48,6 @@ def task_repair_transactions():
 
 @celery.task()
 def block_checker(block_hash):
-    block_hash = block_hash
-    print(block_hash)
-
     # maybe parser in progress
     parced_now = redis_store.get('parsed_block')
     if parced_now == b'parsing':
