@@ -9,13 +9,13 @@ class Config(object):
     CELERY_QUEUES = (
         Queue('default', Exchange('default'), routing_key='default'),
         Queue('block', Exchange('block'), routing_key='block'),
-        Queue('tx', Exchange('tx'), routing_key='tx')
+        Queue('find_previous', Exchange('find_previous'), routing_key='find_previous')
     )
 
     CELERY_ROUTES = {
         'controllers.tasks.*': {'queue': 'default'},
         'controllers.tasks.block_checker': {'queue': 'block'},
-        'controllers.tasks.find_previous': {'queue': 'tx'},
+        'controllers.tasks.find_previous': {'queue': 'find_previous'},
     }
 
     CELERY_TASK_DEFAULT_QUEUE = 'default'

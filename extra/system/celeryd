@@ -3,7 +3,8 @@
 #CELERYD_NODES="worker1"
 #   but you can also start multiple and configure settings
 #   for each in CELERYD_OPTS
-CELERYD_NODES="worker1 worker2 worker3"
+CELERYD_NODES="wblock wfind_previous  wdefault"
+
 #   alternatively, you can specify the number of nodes to start:
 #CELERYD_NODES=10
 
@@ -20,7 +21,7 @@ CELERY_APP="celery_worker.celery"
 CELERYD_CHDIR="/var/JABE"
 
 # Extra command-line arguments to the worker
-CELERYD_OPTS="--concurrency=10 -Q tx,block,default"
+CELERYD_OPTS="--concurrency=4 -l WARNING -Q:1 block  -Q:2 find_previous -Q:3 default"
 
 # CELERYD_OPTS="--concurrency=10 -Q tx,block,default"
 # Configure node-specific settings by appending node name to arguments:
