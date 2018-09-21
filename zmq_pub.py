@@ -58,9 +58,10 @@ class ZMQHandler():
           sequence = str(msgSequence)
         if topic == b"hashblock":
             print('- HASH BLOCK ('+sequence+') -')
+            block_hash = binascii.hexlify(body)
+            print(block_hash)
             try:
-                print('new block')
-                block_checker.delay(body)
+                block_checker.delay(block_hash)
             except Exception as e:
                 print(e)
 
