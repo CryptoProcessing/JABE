@@ -42,46 +42,24 @@ python manage.py db upgrade
 ```
 
 ## start gunicorn
-если еще не установлен supervisor то
 ```bash
-apt-get install supervisor
-```
-скопровать в /etc/supervisor/conf.d/
-конфиг Gunicorn из папки extra/etc/supervisor/conf.d/jabe.conf
+sudo systemctl daemon-reload
+sudo systemctl start gunicorn.service
+sudo systemctl restart gunicorn.service
 
-команды для supervisor
+sudo systemctl start gunicorn.socket
+sudo systemctl restart gunicorn.socket
+```
+
+#run celery worker
+
 ```bash
-supervisorctl reread
-supervisorctl update
-supervisorctl status jabe
-supervisorctl restart jabe
+celery worker -A wallet.celery_worker.celery --loglevel=info
+
 ```
-проверка
-ps xa | grep gunicorn
-
-
-
+or 
 ## start celery daemon
 
-```
-celery worker -A celery_worker.celery --loglevel=info
-```
-https://github.com/celery/celery/tree/master/extra/generic-init.d
-
-```bash
- Скопировать celeryd в /etc/init.d/celeryd
-$ sudo chmod 755 /etc/init.d/celeryd
-$ sudo chown root:root /etc/init.d/celeryd
-
-Скопировать конфигурационный файл в /etc/default/celeryd
-
-Запуск
-$ sudo /etc/init.d/celeryd start
-Статус
-$ sudo /etc/init.d/celeryd status
-Остановка
-$ sudo /etc/init.
-```
 ## nginx
 
 ```bash
