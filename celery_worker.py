@@ -1,5 +1,5 @@
 import os
-from controllers.api_controller import block_checker
+# from controllers.api_controller import block_checker
 from JABE import create_app, make_celery
 
 

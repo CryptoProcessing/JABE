@@ -54,7 +54,7 @@ sudo systemctl restart gunicorn.socket
 #run celery worker
 
 ```bash
-celery worker -A wallet.celery_worker.celery --loglevel=info
+celery worker -A celery_worker.celery --loglevel=info
 
 ```
 or 
